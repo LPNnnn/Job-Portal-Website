@@ -1,0 +1,3 @@
+AMY WONG,amy@gmail.com,c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646
+Jamie Ng,jaimieng@gmail.com,e2feb8e7cfb66a6d5c5127cba9d72affcd18e541eebb9710464f30254a8f8682
+Bob Chan,bob@gmail.com,8273194a4f41fd341fc7ded3ddca773a870125244a989153bf1319a11e26529f
