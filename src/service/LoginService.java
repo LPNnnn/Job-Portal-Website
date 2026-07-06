@@ -13,7 +13,7 @@ public class LoginService {
         if (ValidationUtil.isEmpty(email)
                 || ValidationUtil.isEmpty(password)) {
 
-            return "Login Failed!\nEmail and password are required.";
+            return "Login Failed!\nEmail and password are required. Please try again.";
 
         }
 
