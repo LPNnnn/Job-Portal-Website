@@ -46,6 +46,27 @@ public class JobSeekerRepository {
 
     }
 
-    // save() method is DELETED for this commit
+    public void save(JobSeeker user) {
+
+        try {
+
+            BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(FILE_NAME, true));
+
+            bw.write(user.getFullName() + ","
+                    + user.getEmail() + ","
+                    + user.getPassword());
+
+            bw.newLine();
+
+            bw.close();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
 
 }
