@@ -1,141 +1,49 @@
 package repository;
 
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import model.JobSeeker;
+import util.PasswordUtil;
 
 public class JobSeekerRepository {
+    private static List<JobSeeker> users = new ArrayList<>();
 
-    private final String FILE_NAME = "data/jobseekers.txt";
-
-    public boolean emailExists(String email) {
-
-        try {
-
-            File file = new File(FILE_NAME);
-
-            if (!file.exists()) {
-                return false;
-            }
-
-            BufferedReader br = new BufferedReader(new FileReader(file));
-
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                String[] data = line.split(",");
-
-                if (data[1].equalsIgnoreCase(email)) {
-
-                    br.close();
-                    return true;
-
-                }
-
-            }
-
-            br.close();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
-        return false;
-
+    // Add some sample users for testing
+    static {
+        // Sample user for testing (password: "password123")
+        users.add(new JobSeeker("John Doe", "john@example.com", PasswordUtil.encrypt("password123")));
+        users.add(new JobSeeker("Jane Smith", "jane@example.com", PasswordUtil.encrypt("password123")));
+        users.add(new JobSeeker("Admin User", "admin@test.com", PasswordUtil.encrypt("admin1234")));
     }
 
-    public void save(JobSeeker user) {
-
-        try {
-
-            BufferedWriter bw = new BufferedWriter(
-                    new FileWriter(FILE_NAME, true));
-
-            bw.write(user.getFullName() + ","
-                    + user.getEmail() + ","
-                    + user.getPassword());
-
-            bw.newLine();
-
-            bw.close();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-        }
-
+    public void save(JobSeeker jobSeeker) {
+        users.add(jobSeeker);
+        System.out.println("User saved successfully!");
     }
 
-    public boolean login(String email, String encryptedPassword) {
-
-        try {
-
-            BufferedReader br = new BufferedReader(
-                    new FileReader(FILE_NAME));
-
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                String[] data = line.split(",");
-
-                if (data[1].equalsIgnoreCase(email)
-                        && data[2].equals(encryptedPassword)) {
-
-                    br.close();
-                    return true;
-
-                }
-
+    public JobSeeker login(String email, String password) {
+        for (JobSeeker user : users) {
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(password)) {
+                return user;
             }
-
-            br.close();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
         }
-
-        return false;
-
+        return null;
     }
 
-    public boolean emailExistsOnly(String email) {
-
-        try {
-
-            BufferedReader br = new BufferedReader(
-                    new FileReader(FILE_NAME));
-
-            String line;
-
-            while ((line = br.readLine()) != null) {
-
-                String[] data = line.split(",");
-
-                if (data[1].equalsIgnoreCase(email)) {
-
-                    br.close();
-                    return true;
-
-                }
-
+    public JobSeeker findByEmail(String email) {
+        for (JobSeeker user : users) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return user;
             }
-
-            br.close();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
         }
-
-        return false;
-
+        return null;
     }
 
+    // For debugging - optional
+    public void displayAllUsers() {
+        System.out.println("\n=== All Registered Users ===");
+        for (JobSeeker user : users) {
+            System.out.println(user);
+        }
+    }
 }

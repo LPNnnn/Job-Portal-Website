@@ -8,89 +8,39 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
 
-        RegistrationService registrationService = new RegistrationService();
-        LoginService loginService = new LoginService();
+        RegistrationService register = new RegistrationService();
+        LoginService login = new LoginService();
 
         int choice;
 
         do {
-
-            System.out.println("\n=================================");
-            System.out.println("       JOB PORTAL SYSTEM");
-            System.out.println("=================================");
-            System.out.println("1. Register");
-            System.out.println("2. Login");
+            System.out.println("\n====================");
+            System.out.println(" JOB PORTAL SYSTEM ");
+            System.out.println("====================");
+            System.out.println("1. Job Seeker Registration");
+            System.out.println("2. Job Seeker Login");
             System.out.println("3. Exit");
-            System.out.print("\nEnter your choice: ");
-
-            while (!sc.hasNextInt()) {
-                System.out.println("\nInvalid input. Please enter a number.");
-                sc.next();
-                System.out.print("\nEnter your choice: ");
-            }
+            System.out.print("Choice : ");
 
             choice = sc.nextInt();
-            sc.nextLine();
+            sc.nextLine(); // Consume the newline
 
             switch (choice) {
-
                 case 1:
-
-                    System.out.println("\n===== JOB SEEKER REGISTRATION =====");
-
-                    System.out.print("Full Name : ");
-                    String name = sc.nextLine();
-
-                    System.out.print("Email : ");
-                    String email = sc.nextLine();
-
-                    System.out.print("Password : ");
-                    String password = sc.nextLine();
-
-                    String registerResult =
-                            registrationService.register(name, email, password);
-
-                    System.out.println();
-                    System.out.println(registerResult);
-
+                    register.register(sc);
                     break;
-
                 case 2:
-
-                    System.out.println("\n========== LOGIN ==========");
-
-                    System.out.print("Email : ");
-                    String loginEmail = sc.nextLine();
-
-                    System.out.print("Password : ");
-                    String loginPassword = sc.nextLine();
-
-                    String loginResult =
-                            loginService.login(loginEmail, loginPassword);
-
-                    System.out.println();
-                    System.out.println(loginResult);
-
+                    login.login(sc);
                     break;
-
                 case 3:
-
-                    System.out.println("\n\nThank you for using Job Portal.");
                     System.out.println("Goodbye!");
-
                     break;
-
                 default:
-
-                    System.out.println("\n\nInvalid choice.");
-                    System.out.println("Please choose between 1 and 3.");
-
+                    System.out.println("Invalid choice.");
             }
 
         } while (choice != 3);
 
         sc.close();
-
     }
-
 }

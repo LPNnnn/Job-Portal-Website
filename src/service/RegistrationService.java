@@ -1,5 +1,6 @@
 package service;
 
+import java.util.Scanner;
 import model.JobSeeker;
 import repository.JobSeekerRepository;
 import util.PasswordUtil;
@@ -7,48 +8,46 @@ import util.ValidationUtil;
 
 public class RegistrationService {
 
-    private JobSeekerRepository repository =
-            new JobSeekerRepository();
+    private JobSeekerRepository repository = new JobSeekerRepository();
 
-    public String register(String name,
-                           String email,
-                           String password) {
+    public void register(Scanner sc) {
+        System.out.println("\n========== REGISTRATION ==========");
 
-        if (ValidationUtil.isEmpty(name)
-                || ValidationUtil.isEmpty(email)
-                || ValidationUtil.isEmpty(password)) {
+        System.out.print("Full Name : ");
+        String fullName = sc.nextLine();
 
-            return "Registration Failed!\nRequired fields cannot be empty.";
-
+        if (ValidationUtil.isEmpty(fullName)) {
+            System.out.println("Full name cannot be empty.");
+            return;
         }
+
+        System.out.print("Email : ");
+        String email = sc.nextLine().trim();
 
         if (!ValidationUtil.isValidEmail(email)) {
-
-            return "Registration Failed!\nInvalid email format.";
-
+            System.out.println("Invalid email format.");
+            return;
         }
+
+        // Check if email already exists
+        if (repository.findByEmail(email) != null) {
+            System.out.println("Email already registered. Please use a different email.");
+            return;
+        }
+
+        System.out.print("Password : ");
+        String password = sc.nextLine();
 
         if (!ValidationUtil.isValidPassword(password)) {
-
-            return "Registration Failed!\nPassword must contain at least 8 characters.";
-
+            System.out.println("Password must be at least 8 characters long.");
+            return;
         }
 
-        if (repository.emailExists(email)) {
+        String encryptedPassword = PasswordUtil.encrypt(password);
 
-            return "Registration Failed!\nEmail already exists.";
+        JobSeeker jobSeeker = new JobSeeker(fullName, email, encryptedPassword);
+        repository.save(jobSeeker);
 
-        }
-
-        password = PasswordUtil.encrypt(password);
-
-        JobSeeker user =
-                new JobSeeker(name, email, password);
-
-        repository.save(user);
-
-        return "Registration Successful!";
-
+        System.out.println("Registration successful!");
     }
-
 }
