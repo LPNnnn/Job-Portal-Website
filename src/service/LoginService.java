@@ -19,7 +19,7 @@ public class LoginService {
 
         if (!repository.emailExistsOnly(email)) {
 
-            return "Login Failed!\nAccount does not exist.\nPlease register first.";
+            return "Login Failed!\nAccount does not exist.";
 
         }
 
