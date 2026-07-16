@@ -100,4 +100,4 @@ public class Main {
             System.out.print("Choose an option: ");
         }
     }
-}
+}// Initial JobPortal structure committed on 16/7/2026 
