@@ -50,6 +50,9 @@ public class LoginService {
         JobSeeker jobSeeker = account.get();
         String encryptedPassword = PasswordUtil.encryptPassword(password);
 
+        String encryptedPassword =
+                PasswordUtil.encryptPassword(password);
+
         if (!jobSeeker.getPassword().equals(encryptedPassword)) {
             System.out.println(
                     "Login failed: Incorrect password."
@@ -91,6 +94,10 @@ public class LoginService {
 
                 case 0:
                     logout();
+                    currentLoggedInJobSeeker = null;
+                    System.out.println(
+                            "Job seeker logged out successfully."
+                    );
                     running = false;
                     break;
 
@@ -111,6 +118,10 @@ public class LoginService {
 
             if (!ValidationUtil.isValidEmail(email)) {
                 System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
+                System.out.println(
+                        ValidationUtil.getEmailRequirementMessage()
+                                + "\n"
+                );
                 continue;
             }
 
@@ -157,6 +168,7 @@ public class LoginService {
                 }
             } catch (NumberFormatException exception) {
                 // Show the common error below.
+                // Common error is shown below.
             }
 
             System.out.println(
@@ -167,3 +179,5 @@ public class LoginService {
         }
     }
 }
+// Updated 23/7/2026 
+// Re-committed on 22/7/2026 

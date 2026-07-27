@@ -6,6 +6,8 @@ public class PasswordUtil {
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     // Simple Caesar cipher encryption (shift +2)
+    public static final int MIN_PASSWORD_LENGTH = 8;
+
     public static String encryptPassword(String password) {
         if (password == null || password.isEmpty()) {
             return "";
@@ -35,3 +37,4 @@ public class PasswordUtil {
         return decrypted.toString();
     }
 }
+// Updated 23/7/2026 

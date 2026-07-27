@@ -42,7 +42,6 @@ public class ValidationUtil {
         return false;
     }
 
-    // ===== PASSWORD VALIDATION =====
     public static boolean isValidPassword(String password) {
         if (password == null) {
             return false;
@@ -80,7 +79,6 @@ public class ValidationUtil {
                 && hasSpecialCharacter;
     }
 
-    // ===== NAME VALIDATION =====
     public static boolean isValidName(String name) {
         if (name == null) {
             return false;
@@ -95,7 +93,6 @@ public class ValidationUtil {
         return name.matches("^[A-Za-z][A-Za-z\\s.'-]*$");
     }
 
-    // ===== COMPANY NAME VALIDATION =====
     public static boolean isValidCompanyName(String companyName) {
         if (companyName == null) {
             return false;
@@ -113,14 +110,12 @@ public class ValidationUtil {
         );
     }
 
-    // ===== EMAIL REQUIREMENT MESSAGE =====
     public static String getEmailRequirementMessage() {
         return "Email must use one of these domains: "
                 + "gmail.com, yahoo.com, hotmail.com, "
                 + "outlook.com, or icloud.com.";
     }
 
-    // ===== PASSWORD REQUIREMENT MESSAGE =====
     public static String getPasswordRequirementMessage() {
         return "Password must contain at least "
                 + PasswordUtil.MIN_PASSWORD_LENGTH

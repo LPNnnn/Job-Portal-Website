@@ -68,6 +68,8 @@ public class CompanyRegistrationService {
             if (!ValidationUtil.isValidCompanyName(companyName)) {
                 System.out.println(
                         "Company name must contain 2 to 100 valid characters.\n"
+                        "Company name must contain 2 to 100 "
+                                + "valid characters.\n"
                 );
                 continue;
             }
@@ -87,6 +89,10 @@ public class CompanyRegistrationService {
 
             if (!ValidationUtil.isValidEmail(email)) {
                 System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
+                System.out.println(
+                        ValidationUtil.getEmailRequirementMessage()
+                                + "\n"
+                );
             } else if (repository.emailExists(email)) {
                 System.out.println(
                         "Company email already exists.\n"
@@ -109,6 +115,8 @@ public class CompanyRegistrationService {
             if (!ValidationUtil.isValidPassword(password)) {
                 System.out.println(
                         ValidationUtil.getPasswordRequirementMessage() + "\n"
+                        ValidationUtil.getPasswordRequirementMessage()
+                                + "\n"
                 );
                 continue;
             }
@@ -117,3 +125,5 @@ public class CompanyRegistrationService {
         }
     }
 }
+// Updated 23/7/2026 
+// Re-committed on 22/7/2026 

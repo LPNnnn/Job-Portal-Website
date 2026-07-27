@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class CompanyRepository {
 
@@ -21,6 +25,8 @@ public class CompanyRepository {
     public CompanyRepository() {
         createDataFile();
         reload();
+    public CompanyRepository() {
+        createDataFile();
     }
 
     private void createDataFile() {
@@ -71,6 +77,8 @@ public class CompanyRepository {
                 || company.getCompanyEmail() == null
                 || company.getCompanyEmail().trim().isEmpty()
                 || emailExists(company.getCompanyEmail())) {
+    public boolean save(Company company) {
+        if (company == null) {
             return false;
         }
 
@@ -111,3 +119,34 @@ public class CompanyRepository {
         return findByEmail(email).isPresent();
     }
 }
+    public boolean emailExists(String email) {
+        java.io.File file = new java.io.File(FILE_NAME);
+
+        try (java.io.BufferedReader reader =
+                     new java.io.BufferedReader(
+                             new java.io.FileReader(file)
+                     )) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                Company company = Company.fromString(line);
+
+                if (company != null
+                        && company.getCompanyEmail()
+                        .equalsIgnoreCase(email.trim())) {
+                    return true;
+                }
+            }
+        } catch (IOException exception) {
+            System.out.println(
+                    "Unable to read company data: "
+                            + exception.getMessage()
+            );
+        }
+
+        return false;
+    }
+}
+// Re-committed on 16/7/2026 
+// Re-committed on 17/7/2026 

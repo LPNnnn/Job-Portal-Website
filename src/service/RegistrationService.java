@@ -68,6 +68,7 @@ public class RegistrationService {
             if (!ValidationUtil.isValidName(fullName)) {
                 System.out.println(
                         "Invalid name. Use at least 2 letters.\n"
+                        "Invalid name. Use 2 to 50 letters.\n"
                 );
                 continue;
             }
@@ -87,6 +88,10 @@ public class RegistrationService {
 
             if (!ValidationUtil.isValidEmail(email)) {
                 System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
+                System.out.println(
+                        ValidationUtil.getEmailRequirementMessage()
+                                + "\n"
+                );
             } else if (repository.emailExists(email)) {
                 System.out.println("Email already exists.\n");
             } else {
@@ -107,6 +112,8 @@ public class RegistrationService {
             if (!ValidationUtil.isValidPassword(password)) {
                 System.out.println(
                         ValidationUtil.getPasswordRequirementMessage() + "\n"
+                        ValidationUtil.getPasswordRequirementMessage()
+                                + "\n"
                 );
                 continue;
             }
@@ -115,3 +122,5 @@ public class RegistrationService {
         }
     }
 }
+// Updated 23/7/2026 
+// Re-committed on 22/7/2026 
