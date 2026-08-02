@@ -8,9 +8,6 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -29,7 +26,7 @@ jobs:
         run: find . -name build.xml -print
 
       - name: Build project
-        run: ant -noinput -f JobProtalWebsite/build.xml clean jar
+        run: ant -noinput -f build.xml clean jar
 
       - name: Run JUnit tests
-        run: ant -noinput -f JobProtalWebsite/build.xml test
+        run: ant -noinput -f build.xml test
