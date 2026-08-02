@@ -3,6 +3,7 @@ package service;
 import model.JobSeeker;
 import repository.JobSeekerRepository;
 import util.PasswordUtil;
+import util.ConsoleInputUtil;
 import util.ValidationUtil;
 
 import java.util.Optional;
@@ -10,31 +11,94 @@ import java.util.Scanner;
 
 public class LoginService {
 
-    private final JobSeekerRepository repository =
-            new JobSeekerRepository();
+    private static LoginService instance;
 
-    private JobSeeker currentLoggedInJobSeeker;
+    private final JobSeekerRepository repository;
+    private final ProfileService profileService;
+    private final Scanner scanner;
 
-    public void login(Scanner scanner) {
-        System.out.println("\n========================================");
+    private LoginService() {
+        repository = JobSeekerRepository.getInstance();
+        profileService = ProfileService.getInstance();
+        scanner = new Scanner(System.in);
+    }
+
+    public static LoginService getInstance() {
+        if (instance == null) {
+            instance = new LoginService();
+        }
+
+        return instance;
+    }
+
+    public void showLoginMenu() {
+        login();
+    }
+
+    // =====================================================
+    // JOB SEEKER LOGIN
+    // =====================================================
+
+    public void login() {
+        System.out.println("\n=================================");
         System.out.println("          JOB SEEKER LOGIN");
-        System.out.println("========================================");
+        System.out.println("=================================");
         System.out.println("Enter 0 at any field to cancel.");
 
-        String email = readEmail(scanner);
+        String email = readEmail();
 
         if (email == null) {
-            System.out.println("Job seeker login cancelled.");
+            System.out.println("Login cancelled.");
             return;
         }
 
-        String password = readPassword(scanner);
+        String password = readPassword();
 
         if (password == null) {
-            System.out.println("Job seeker login cancelled.");
+            System.out.println("Login cancelled.");
             return;
         }
 
+        authenticate(email, password);
+    }
+
+    // =====================================================
+    // LOGIN WITH EXISTING SCANNER
+    // =====================================================
+
+    public void login(Scanner inputScanner) {
+        if (inputScanner == null) {
+            login();
+            return;
+        }
+
+        System.out.println("\n=================================");
+        System.out.println("          JOB SEEKER LOGIN");
+        System.out.println("=================================");
+        System.out.println("Enter 0 at any field to cancel.");
+
+        String email = readEmail(inputScanner);
+
+        if (email == null) {
+            System.out.println("Login cancelled.");
+            return;
+        }
+
+        String password = readPassword(inputScanner);
+
+        if (password == null) {
+            System.out.println("Login cancelled.");
+            return;
+        }
+
+        authenticate(email, password);
+    }
+
+    // =====================================================
+    // AUTHENTICATION
+    // =====================================================
+
+    private void authenticate(String email, String password) {
         repository.reload();
 
         Optional<JobSeeker> account =
@@ -42,75 +106,130 @@ public class LoginService {
 
         if (account.isEmpty()) {
             System.out.println(
-                    "Login failed: Job seeker account was not found."
+                    "Login failed: No job seeker account was found "
+                            + "for this email."
             );
             return;
         }
 
         JobSeeker jobSeeker = account.get();
-        String encryptedPassword = PasswordUtil.encryptPassword(password);
 
-        if (!jobSeeker.getPassword().equals(encryptedPassword)) {
+        String encryptedPassword;
+
+        try {
+            encryptedPassword =
+                    PasswordUtil.encryptPassword(password);
+
+        } catch (Exception exception) {
+            System.out.println(
+                    "Login failed: Unable to process the password."
+            );
+            return;
+        }
+
+        if (jobSeeker.getPassword() == null
+                || !jobSeeker.getPassword()
+                .equals(encryptedPassword)) {
+
             System.out.println(
                     "Login failed: Incorrect password."
             );
             return;
         }
 
-        currentLoggedInJobSeeker = jobSeeker;
+        profileService.setCurrentUser(jobSeeker);
 
-        System.out.println("\nJob seeker login successful.");
+        System.out.println("\nLogin successful.");
         System.out.println(
-                "Welcome, " + jobSeeker.getFullName() + "!"
+                "Welcome, "
+                        + displayName(jobSeeker)
+                        + "!"
         );
 
-        showDashboard(scanner);
+        showJobSeekerMenu();
     }
 
-    private void showDashboard(Scanner scanner) {
+    // =====================================================
+    // JOB SEEKER MENU
+    // =====================================================
+
+    private void showJobSeekerMenu() {
         boolean running = true;
 
-        while (running && currentLoggedInJobSeeker != null) {
-            System.out.println("\n========================================");
-            System.out.println("       JOB SEEKER DASHBOARD");
-            System.out.println("========================================");
-            System.out.println("1. View Account Information");
+        while (running && profileService.isLoggedIn()) {
+            System.out.println("\n=================================");
+            System.out.println("         JOB SEEKER MENU");
+            System.out.println("=================================");
+            System.out.println("1. View Profile");
+            System.out.println("2. Edit Profile");
+            System.out.println("3. Profile Completion");
             System.out.println("0. Logout");
-            System.out.println("========================================");
-            System.out.print("Choose an option: ");
+            System.out.println("=================================");
 
-            int choice = readMenuChoice(scanner, 0, 1);
+            int choice = readMenuChoice(
+                    "Choose an option: ",
+                    0,
+                    4
+            );
 
             switch (choice) {
                 case 1:
-                    System.out.println("\nFull Name : "
-                            + currentLoggedInJobSeeker.getFullName());
-                    System.out.println("Email     : "
-                            + currentLoggedInJobSeeker.getEmail());
+                    profileService.viewProfile();
+                    break;
+
+                case 2:
+                    profileService.editProfile();
+                    break;
+
+                case 3:
+                    profileService.displayProfileCompletion();
                     break;
 
                 case 0:
-                    logout();
+                    profileService.logout();
                     running = false;
                     break;
 
                 default:
-                    break;
+                    System.out.println(
+                            "Invalid option."
+                    );
             }
         }
     }
 
-    private String readEmail(Scanner scanner) {
+    // =====================================================
+    // EMAIL INPUT
+    // =====================================================
+
+    private String readEmail() {
+        return readEmail(scanner);
+    }
+
+    private String readEmail(Scanner inputScanner) {
         while (true) {
-            System.out.print("Email : ");
-            String email = scanner.nextLine().trim();
+            System.out.print("Email: ");
+
+            String email =
+                    inputScanner.nextLine().trim();
 
             if (email.equals("0")) {
                 return null;
             }
 
+            if (email.isEmpty()) {
+                System.out.println(
+                        "Error: Email cannot be empty."
+                );
+                continue;
+            }
+
             if (!ValidationUtil.isValidEmail(email)) {
-                System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
+                System.out.println(
+                        "Error: "
+                                + ValidationUtil
+                                .getEmailRequirementMessage()
+                );
                 continue;
             }
 
@@ -118,52 +237,100 @@ public class LoginService {
         }
     }
 
-    private String readPassword(Scanner scanner) {
+    // =====================================================
+    // PASSWORD INPUT
+    // =====================================================
+
+    private String readPassword() {
+        return readPassword(scanner);
+    }
+
+    private String readPassword(Scanner inputScanner) {
         while (true) {
-            System.out.print("Password : ");
-            String password = scanner.nextLine();
+            String password = ConsoleInputUtil.readPassword(
+                    inputScanner,
+                    "Password: "
+            );
 
             if (password.equals("0")) {
                 return null;
             }
 
             if (password.trim().isEmpty()) {
-                System.out.println("Password cannot be empty.\n");
+                System.out.println(
+                        "Error: Password cannot be empty."
+                );
                 continue;
             }
 
+            /*
+             * Do not apply the full registration password
+             * strength validation here.
+             *
+             * During login, the system only needs to compare
+             * the entered password with the stored password.
+             */
             return password;
         }
     }
 
-    public void logout() {
-        currentLoggedInJobSeeker = null;
-        System.out.println("Job seeker logged out successfully.");
-    }
+    // =====================================================
+    // MENU INPUT
+    // =====================================================
 
     private int readMenuChoice(
-            Scanner scanner,
+            String message,
             int minimum,
             int maximum) {
 
         while (true) {
-            String input = scanner.nextLine().trim();
+            System.out.print(message);
+
+            String input =
+                    scanner.nextLine().trim();
 
             try {
-                int choice = Integer.parseInt(input);
+                int choice =
+                        Integer.parseInt(input);
 
-                if (choice >= minimum && choice <= maximum) {
+                if (choice >= minimum
+                        && choice <= maximum) {
+
                     return choice;
                 }
+
             } catch (NumberFormatException exception) {
-                // Show the common error below.
+                // Display shared error message below.
             }
 
             System.out.println(
                     "Invalid option. Please enter a number from "
-                            + minimum + " to " + maximum + "."
+                            + minimum
+                            + " to "
+                            + maximum
+                            + "."
             );
-            System.out.print("Choose an option: ");
         }
+    }
+
+    // =====================================================
+    // HELPER METHODS
+    // =====================================================
+
+    private String displayName(JobSeeker jobSeeker) {
+        if (jobSeeker == null) {
+            return "Job Seeker";
+        }
+
+        String fullName =
+                jobSeeker.getFullName();
+
+        if (fullName == null
+                || fullName.trim().isEmpty()) {
+
+            return jobSeeker.getEmail();
+        }
+
+        return fullName.trim();
     }
 }

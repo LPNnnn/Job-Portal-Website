@@ -2,112 +2,119 @@ package service;
 
 import java.util.Optional;
 import java.util.Scanner;
+
 import model.Company;
 import repository.CompanyRepository;
 import util.PasswordUtil;
+import util.ConsoleInputUtil;
 import util.ValidationUtil;
 
 public class CompanyLoginService {
 
-    private final CompanyRepository repository =
-            new CompanyRepository();
+    private static CompanyLoginService instance;
+
+    private final CompanyRepository repository;
 
     private Company currentLoggedInCompany;
 
+    private CompanyLoginService() {
+        repository = CompanyRepository.getInstance();
+    }
+
+    public static CompanyLoginService getInstance() {
+        if (instance == null) {
+            instance = new CompanyLoginService();
+        }
+
+        return instance;
+    }
+
     public void login(Scanner scanner) {
-        System.out.println("\n========================================");
-        System.out.println("            EMPLOYER LOGIN");
-        System.out.println("========================================");
-        System.out.println("Enter 0 at any field to cancel.");
+        boolean loginRunning = true;
 
-        String email = readEmail(scanner);
+        while (loginRunning) {
+            System.out.println("\n========================================");
+            System.out.println("            EMPLOYER LOGIN");
+            System.out.println("========================================");
+            System.out.println("Enter 0 at any field to cancel.");
 
-        if (email == null) {
-            System.out.println("Employer login cancelled.");
-            return;
-        }
+            String email = readEmail(scanner);
 
-        String password = readPassword(scanner);
+            if (email == null) {
+                System.out.println("Employer login cancelled.");
+                return;
+            }
 
-        if (password == null) {
-            System.out.println("Employer login cancelled.");
-            return;
-        }
+            String password = readPassword(scanner);
 
-        repository.reload();
+            if (password == null) {
+                System.out.println("Employer login cancelled.");
+                return;
+            }
 
-        Optional<Company> account =
-                repository.findByEmail(email);
+            repository.reload();
 
-        if (account.isEmpty()) {
+            Optional<Company> account =
+                    repository.findByEmail(email);
+
+            if (account.isEmpty()) {
+                System.out.println(
+                        "\nLogin failed: Employer account was not found."
+                );
+                System.out.println("Please try again.");
+                continue;
+            }
+
+            Company company = account.get();
+
+            String encryptedPassword =
+                    PasswordUtil.encryptPassword(password);
+
+            if (!company.getPassword()
+                    .equals(encryptedPassword)) {
+
+                System.out.println(
+                        "\nLogin failed: Incorrect password."
+                );
+                System.out.println("Please try again.");
+                continue;
+            }
+
+            currentLoggedInCompany = company;
+
             System.out.println(
-                    "Login failed: Employer account was not found."
+                    "\nEmployer login successful."
             );
-            return;
-        }
-
-        Company company = account.get();
-        String encryptedPassword = PasswordUtil.encryptPassword(password);
-
-        if (!company.getPassword().equals(encryptedPassword)) {
             System.out.println(
-                    "Login failed: Incorrect password."
+                    "Welcome, "
+                            + company.getCompanyName()
+                            + "!"
             );
-            return;
+
+            showDashboard(scanner);
+            loginRunning = false;
         }
-
-        currentLoggedInCompany = company;
-
-        System.out.println("\nEmployer login successful.");
-        System.out.println(
-                "Welcome, " + company.getCompanyName() + "!"
-        );
-
-        showDashboard(scanner);
     }
 
     private void showDashboard(Scanner scanner) {
-        boolean running = true;
-
-        while (running && currentLoggedInCompany != null) {
+        while (currentLoggedInCompany != null) {
             System.out.println("\n========================================");
             System.out.println("          EMPLOYER DASHBOARD");
             System.out.println("========================================");
-            System.out.println("1. View Company Information");
             System.out.println("0. Logout");
             System.out.println("========================================");
             System.out.print("Choose an option: ");
 
-            int choice = readMenuChoice(scanner, 0, 1);
+            String input = scanner.nextLine().trim();
 
-            switch (choice) {
-                case 1:
-                    viewCompanyInformation();
-                    break;
-
-                case 0:
-                    logout();
-                    running = false;
-                    break;
-
-                default:
-                    break;
+            if (input.equals("0")) {
+                logout();
+            } else {
+                System.out.println(
+                        "Invalid option. Please enter 0 to logout."
+                );
             }
         }
-    }
-
-    private void viewCompanyInformation() {
-        System.out.println("\n========================================");
-        System.out.println("        COMPANY INFORMATION");
-        System.out.println("========================================");
-        System.out.println(
-                "Company Name  : "
-                        + currentLoggedInCompany.getCompanyName()
-        );
-        System.out.println(
-                "Company Email : "
-                        + currentLoggedInCompany.getCompanyEmail()
-        );
     }
 
     private String readEmail(Scanner scanner) {
@@ -120,7 +127,10 @@ public class CompanyLoginService {
             }
 
             if (!ValidationUtil.isValidEmail(email)) {
-                System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
+                System.out.println(
+                        ValidationUtil.getEmailRequirementMessage()
+                                + "\n"
+                );
                 continue;
             }
 
@@ -130,15 +140,19 @@ public class CompanyLoginService {
 
     private String readPassword(Scanner scanner) {
         while (true) {
-            System.out.print("Password : ");
-            String password = scanner.nextLine();
+            String password = ConsoleInputUtil.readPassword(
+                    scanner,
+                    "Password : "
+            );
 
             if (password.equals("0")) {
                 return null;
             }
 
             if (password.trim().isEmpty()) {
-                System.out.println("Password cannot be empty.\n");
+                System.out.println(
+                        "Password cannot be empty.\n"
+                );
                 continue;
             }
 
@@ -148,32 +162,8 @@ public class CompanyLoginService {
 
     public void logout() {
         currentLoggedInCompany = null;
-        System.out.println("Employer logged out successfully.");
-    }
-
-    private int readMenuChoice(
-            Scanner scanner,
-            int minimum,
-            int maximum) {
-
-        while (true) {
-            String input = scanner.nextLine().trim();
-
-            try {
-                int choice = Integer.parseInt(input);
-
-                if (choice >= minimum && choice <= maximum) {
-                    return choice;
-                }
-            } catch (NumberFormatException exception) {
-                // Show the common error below.
-            }
-
-            System.out.println(
-                    "Invalid option. Please enter a number from "
-                            + minimum + " to " + maximum + "."
-            );
-            System.out.print("Choose an option: ");
-        }
+        System.out.println(
+                "Employer logged out successfully."
+        );
     }
 }
