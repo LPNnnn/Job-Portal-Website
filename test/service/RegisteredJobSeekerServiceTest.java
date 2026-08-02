@@ -3,53 +3,71 @@ package service;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RegisteredJobSeekerServiceTest {
 
+    private RegisteredJobSeekerService service;
     private PrintStream originalOutput;
     private ByteArrayOutputStream capturedOutput;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
+        /*
+         * A fresh output stream is created before every test so that
+         * output from one test does not affect another test.
+         */
+        service = RegisteredJobSeekerService.getInstance();
+
         originalOutput = System.out;
         capturedOutput = new ByteArrayOutputStream();
 
-        System.setOut(new PrintStream(capturedOutput));
+        System.setOut(
+                new PrintStream(capturedOutput)
+        );
     }
 
-    @AfterEach
-    void tearDown() {
+    @After
+    public void tearDown() {
         System.setOut(originalOutput);
     }
 
     @Test
-    void shouldDisplayJobSeekersWithoutPasswords() {
-        RegisteredJobSeekerService service =
-                RegisteredJobSeekerService.getInstance();
+    public void shouldDisplayRegisteredJobSeekersWithoutPasswords() {
+        /*
+         * Expected result:
+         * The registered job seeker heading should be displayed.
+         * Password information should not be displayed.
+         */
 
         service.viewAllRegisteredJobSeekers();
 
-        String output = capturedOutput.toString();
+        String actualOutput =
+                capturedOutput.toString();
 
         assertTrue(
-                output.contains("REGISTERED JOB SEEKERS"),
-                "The registered job seeker heading should be displayed."
+                "The registered job seeker heading should be displayed.",
+                actualOutput.contains(
+                        "REGISTERED JOB SEEKERS"
+                )
         );
 
         assertFalse(
-                output.toLowerCase().contains("password"),
-                "The password label must not be displayed."
+                "The password label must not be displayed.",
+                actualOutput.toLowerCase()
+                        .contains("password")
         );
 
         assertFalse(
-                output.contains("UvwfgpvB345"),
-                "The encrypted password must not be displayed."
+                "The encrypted password must not be displayed.",
+                actualOutput.contains(
+                        "UvwfgpvB345"
+                )
         );
     }
 }
