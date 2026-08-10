@@ -67,6 +67,7 @@ public class CompanyRegistrationService {
 
             if (!ValidationUtil.isValidCompanyName(companyName)) {
                 System.out.println(
+                        "Company name must contain 2 to 100 valid characters.\n"
                         "Company name must contain 2 to 100 "
                                 + "valid characters.\n"
                 );
@@ -87,6 +88,7 @@ public class CompanyRegistrationService {
             }
 
             if (!ValidationUtil.isValidEmail(email)) {
+                System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
                 System.out.println(
                         ValidationUtil.getEmailRequirementMessage()
                                 + "\n"
@@ -112,6 +114,7 @@ public class CompanyRegistrationService {
 
             if (!ValidationUtil.isValidPassword(password)) {
                 System.out.println(
+                        ValidationUtil.getPasswordRequirementMessage() + "\n"
                         ValidationUtil.getPasswordRequirementMessage()
                                 + "\n"
                 );

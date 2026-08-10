@@ -2,6 +2,10 @@ package util;
 
 public class PasswordUtil {
 
+    // Minimum password length requirement
+    public static final int MIN_PASSWORD_LENGTH = 8;
+
+    // Simple Caesar cipher encryption (shift +2)
     public static final int MIN_PASSWORD_LENGTH = 8;
 
     public static String encryptPassword(String password) {
@@ -18,6 +22,7 @@ public class PasswordUtil {
         return encrypted.toString();
     }
 
+    // Decrypt password (shift -2)
     public static String decryptPassword(String encrypted) {
         if (encrypted == null || encrypted.isEmpty()) {
             return "";

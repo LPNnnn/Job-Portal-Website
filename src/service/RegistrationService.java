@@ -67,6 +67,7 @@ public class RegistrationService {
 
             if (!ValidationUtil.isValidName(fullName)) {
                 System.out.println(
+                        "Invalid name. Use at least 2 letters.\n"
                         "Invalid name. Use 2 to 50 letters.\n"
                 );
                 continue;
@@ -86,6 +87,7 @@ public class RegistrationService {
             }
 
             if (!ValidationUtil.isValidEmail(email)) {
+                System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
                 System.out.println(
                         ValidationUtil.getEmailRequirementMessage()
                                 + "\n"
@@ -109,6 +111,7 @@ public class RegistrationService {
 
             if (!ValidationUtil.isValidPassword(password)) {
                 System.out.println(
+                        ValidationUtil.getPasswordRequirementMessage() + "\n"
                         ValidationUtil.getPasswordRequirementMessage()
                                 + "\n"
                 );

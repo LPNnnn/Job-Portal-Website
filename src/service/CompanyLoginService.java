@@ -1,70 +1,66 @@
 package service;
 
-import model.JobSeeker;
-import repository.JobSeekerRepository;
+import java.util.Optional;
+import java.util.Scanner;
+import model.Company;
+import repository.CompanyRepository;
 import util.PasswordUtil;
 import util.ValidationUtil;
 
-import java.util.Optional;
-import java.util.Scanner;
+public class CompanyLoginService {
 
-public class LoginService {
+    private final CompanyRepository repository =
+            new CompanyRepository();
 
-    private final JobSeekerRepository repository =
-            new JobSeekerRepository();
-
-    private JobSeeker currentLoggedInJobSeeker;
+    private Company currentLoggedInCompany;
 
     public void login(Scanner scanner) {
         System.out.println("\n========================================");
-        System.out.println("          JOB SEEKER LOGIN");
+        System.out.println("            EMPLOYER LOGIN");
         System.out.println("========================================");
         System.out.println("Enter 0 at any field to cancel.");
 
         String email = readEmail(scanner);
 
         if (email == null) {
-            System.out.println("Job seeker login cancelled.");
+            System.out.println("Employer login cancelled.");
             return;
         }
 
         String password = readPassword(scanner);
 
         if (password == null) {
-            System.out.println("Job seeker login cancelled.");
+            System.out.println("Employer login cancelled.");
             return;
         }
 
         repository.reload();
 
-        Optional<JobSeeker> account =
+        Optional<Company> account =
                 repository.findByEmail(email);
 
         if (account.isEmpty()) {
             System.out.println(
-                    "Login failed: Job seeker account was not found."
+                    "Login failed: Employer account was not found."
             );
             return;
         }
 
-        JobSeeker jobSeeker = account.get();
+        Company company = account.get();
         String encryptedPassword = PasswordUtil.encryptPassword(password);
 
-        String encryptedPassword =
-                PasswordUtil.encryptPassword(password);
-
-        if (!jobSeeker.getPassword().equals(encryptedPassword)) {
+        if (!company.getPassword().equals(encryptedPassword)) {
             System.out.println(
                     "Login failed: Incorrect password."
             );
             return;
         }
 
-        currentLoggedInJobSeeker = jobSeeker;
+        currentLoggedInCompany = company;
 
-        System.out.println("\nJob seeker login successful.");
+        System.out.println("\nEmployer login successful.");
         System.out.println(
-                "Welcome, " + jobSeeker.getFullName() + "!"
+                "Welcome, " + company.getCompanyName() + "!"
         );
 
         showDashboard(scanner);
@@ -73,11 +69,11 @@ public class LoginService {
     private void showDashboard(Scanner scanner) {
         boolean running = true;
 
-        while (running && currentLoggedInJobSeeker != null) {
+        while (running && currentLoggedInCompany != null) {
             System.out.println("\n========================================");
-            System.out.println("       JOB SEEKER DASHBOARD");
+            System.out.println("          EMPLOYER DASHBOARD");
             System.out.println("========================================");
-            System.out.println("1. View Account Information");
+            System.out.println("1. View Company Information");
             System.out.println("0. Logout");
             System.out.println("========================================");
             System.out.print("Choose an option: ");
@@ -86,18 +82,11 @@ public class LoginService {
 
             switch (choice) {
                 case 1:
-                    System.out.println("\nFull Name : "
-                            + currentLoggedInJobSeeker.getFullName());
-                    System.out.println("Email     : "
-                            + currentLoggedInJobSeeker.getEmail());
+                    viewCompanyInformation();
                     break;
 
                 case 0:
                     logout();
-                    currentLoggedInJobSeeker = null;
-                    System.out.println(
-                            "Job seeker logged out successfully."
-                    );
                     running = false;
                     break;
 
@@ -107,9 +96,23 @@ public class LoginService {
         }
     }
 
+    private void viewCompanyInformation() {
+        System.out.println("\n========================================");
+        System.out.println("        COMPANY INFORMATION");
+        System.out.println("========================================");
+        System.out.println(
+                "Company Name  : "
+                        + currentLoggedInCompany.getCompanyName()
+        );
+        System.out.println(
+                "Company Email : "
+                        + currentLoggedInCompany.getCompanyEmail()
+        );
+    }
+
     private String readEmail(Scanner scanner) {
         while (true) {
-            System.out.print("Email : ");
+            System.out.print("Company Email : ");
             String email = scanner.nextLine().trim();
 
             if (email.equals("0")) {
@@ -118,10 +121,6 @@ public class LoginService {
 
             if (!ValidationUtil.isValidEmail(email)) {
                 System.out.println(ValidationUtil.getEmailRequirementMessage() + "\n");
-                System.out.println(
-                        ValidationUtil.getEmailRequirementMessage()
-                                + "\n"
-                );
                 continue;
             }
 
@@ -148,8 +147,8 @@ public class LoginService {
     }
 
     public void logout() {
-        currentLoggedInJobSeeker = null;
-        System.out.println("Job seeker logged out successfully.");
+        currentLoggedInCompany = null;
+        System.out.println("Employer logged out successfully.");
     }
 
     private int readMenuChoice(
@@ -168,7 +167,6 @@ public class LoginService {
                 }
             } catch (NumberFormatException exception) {
                 // Show the common error below.
-                // Common error is shown below.
             }
 
             System.out.println(
@@ -179,5 +177,3 @@ public class LoginService {
         }
     }
 }
-// Updated 23/7/2026 
-// Re-committed on 22/7/2026 

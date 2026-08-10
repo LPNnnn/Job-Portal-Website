@@ -10,6 +10,7 @@ public class JobSeeker {
     private String email;
     private String password;
 
+    public JobSeeker(String fullName, String email, String password) {
     private static final RegistrationService registrationService
             = new RegistrationService();
 
@@ -50,6 +51,10 @@ public class JobSeeker {
         this.password = safeValue(password);
     }
 
+    @Override
+    public String toString() {
+        return safeValue(fullName) + "|"
+                + safeValue(email) + "|"
     // ========================================
     // JOB SEEKER MENU
     // ========================================
@@ -151,6 +156,10 @@ public class JobSeeker {
             return null;
         }
 
+        return new JobSeeker(data[0], data[1], data[2]);
+    }
+
+    private static String safeValue(String value) {
         return new JobSeeker(
                 data[0],
                 data[1],

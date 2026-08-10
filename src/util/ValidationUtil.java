@@ -5,10 +5,12 @@ public class ValidationUtil {
     private ValidationUtil() {
     }
 
+    // ===== EMPTY VALUE VALIDATION =====
     public static boolean isEmpty(String value) {
         return value == null || value.trim().isEmpty();
     }
 
+    // ===== EMAIL VALIDATION =====
     public static boolean isValidEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return false;
@@ -121,4 +123,3 @@ public class ValidationUtil {
                 + "number, and special character.";
     }
 }
-// Updated 23/7/2026 

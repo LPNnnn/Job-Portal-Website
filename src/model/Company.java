@@ -9,6 +9,9 @@ public class Company {
     private String companyEmail;
     private String password;
 
+    public Company(String companyName, String companyEmail, String password) {
+        this.companyName = safeValue(companyName);
+        this.companyEmail = safeValue(companyEmail).toLowerCase();
     private static final CompanyRegistrationService companyRegistrationService
             = new CompanyRegistrationService();
 
@@ -33,11 +36,24 @@ public class Company {
         return companyEmail;
     }
 
+    public String getEmail() {
+        return companyEmail;
+    }
+
     public String getPassword() {
         return password;
     }
 
     public void setCompanyName(String companyName) {
+        this.companyName = safeValue(companyName);
+    }
+
+    public void setCompanyEmail(String companyEmail) {
+        this.companyEmail = safeValue(companyEmail).toLowerCase();
+    }
+
+    public void setPassword(String password) {
+        this.password = safeValue(password);
 
         this.companyName
                 = safeValue(companyName);
@@ -133,6 +149,8 @@ public class Company {
 
     @Override
     public String toString() {
+        return safeValue(companyName) + "|"
+                + safeValue(companyEmail) + "|"
 
         return safeValue(companyName)
                 + "|"
@@ -153,6 +171,10 @@ public class Company {
             return null;
         }
 
+        return new Company(data[0], data[1], data[2]);
+    }
+
+    private static String safeValue(String value) {
         return new Company(
                 data[0],
                 data[1],
